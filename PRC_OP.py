@@ -6,17 +6,17 @@ from datetime import datetime, timedelta
 import numpy as np
 
 # Set up logging
-log_path = 'C:\\OP\\Log'
+log_path = 'C:\\Log'
 log_filename = 'script_log.txt'
 log_filepath = os.path.join(log_path, log_filename)
 
 logging.basicConfig(filename=log_filepath, level=logging.ERROR,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-# input folder
-folder_path = 'C:\\OP\\ToBeCleaned'
-# output folder 
-output_folder = 'C:\\\\OP\\ToSend'
+# input folder - where postgresql CSV is saved to
+folder_path = 'C:\\ToBeCleaned'
+# output folder - where file is placed after cleaning
+output_folder = 'C:\\CleanedFile'
 # period in seconds to check the root folder for new file
 period_to_check = 1800
 
@@ -34,6 +34,7 @@ df = pd.read_csv(file_path)
 df['Discharge/Service Date'] = pd.to_datetime(df['Discharge/Service Date'], errors='coerce')
 today = datetime.now()
 
+#Remove deceased patients
 df = df[df['Discharge/Service Date'] != '0001-01-01']
 
 df.dropna(subset=['Discharge/Service Date'], inplace=True)
@@ -50,10 +51,10 @@ df = df[df['Physician Name'] != 'CPSI TEST']
 # Convert Admit Source to integer to drop decimal
 # df['Admit Source'] = df['Admit Source'].astype(int)
 
-start_date = pd.to_datetime('2024-02-16')
-end_date = pd.to_datetime('2024-02-22')
+start_date = (datetime.now() - timedelta(days=14)).date()
+end_date = (datetime.now() - timedelta(days=8)).date()
 
-df = df[df['Discharge/Service Date'].between(start_date, end_date)]
+df = df[(df['Discharge/Service Date'].dt.date >= start_date) & (df['Discharge/Service Date'].dt.date <= end_date)]
 
 df['original_index'] = df.index
 
@@ -143,7 +144,7 @@ grouped_df['MRN'] = grouped_df['MRN'].apply(trim_decimal_mrn)
 current_datetime = datetime.now().strftime("%m%d%Y_%H%M%S")
 
 # Create filename
-csv_filename = f'C:\\OP\\Out\\OP_{current_datetime}.csv'
+csv_filename = f'C:\\MirthSent\\PRC\\OP\\ToSend\\PRMC_OP_{current_datetime}.csv'
 
 
 # Write dataframe to CSV
