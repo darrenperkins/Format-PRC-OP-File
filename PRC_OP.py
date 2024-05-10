@@ -144,7 +144,7 @@ grouped_df['MRN'] = grouped_df['MRN'].apply(trim_decimal_mrn)
 current_datetime = datetime.now().strftime("%m%d%Y_%H%M%S")
 
 # Create filename
-csv_filename = f'C:\\MirthSent\\PRC\\OP\\ToSend\\PRMC_OP_{current_datetime}.csv'
+csv_filename = f'C:\\ToSend\\OP_{current_datetime}.csv'
 
 
 # Write dataframe to CSV
